@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactDiffViewer from 'react-diff-viewer-continued';
 
@@ -9,14 +9,14 @@ function ReviewDetail() {
   const [review, setReview] = useState(null);
   const [comment, setComment] = useState('');
   const [line, setLine] = useState('');
+  const [newReviewers, setNewReviewers] = useState('');
+  const [reviewerMsg, setReviewerMsg] = useState('');
 
   useEffect(() => {
     const fetchReview = async () => {
       const token = localStorage.getItem('token');
       if (!token) { navigate('/login'); return; }
-      const res = await axios.get(`http://localhost:5000/api/reviews/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/api/reviews/${id}`);
       setReview(res.data);
     };
     fetchReview();
@@ -24,29 +24,29 @@ function ReviewDetail() {
 
   const handleComment = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
-    await axios.post(`http://localhost:5000/api/reviews/${id}/comments`, { text: comment, line: parseInt(line) }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    await api.post(`/api/reviews/${id}/comments`, { text: comment, line: parseInt(line) });
     setComment('');
     setLine('');
-    const res = await axios.get(`http://localhost:5000/api/reviews/${id}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const res = await api.get(`/api/reviews/${id}`);
     setReview(res.data);
   };
 
   const handleStatus = async (status) => {
-    const token = localStorage.getItem('token');
-    await axios.put(`http://localhost:5000/api/reviews/${id}/status`, { status }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    await api.put(`/api/reviews/${id}/status`, { status });
     setReview({ ...review, status });
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+  const handleAddReviewers = async (e) => {
+    e.preventDefault();
+    setReviewerMsg('');
+    try {
+      const res = await api.post(`/api/reviews/${id}/reviewers`, { reviewers: newReviewers });
+      setReview(res.data);
+      setNewReviewers('');
+      setReviewerMsg('Reviewers added successfully');
+    } catch (err) {
+      setReviewerMsg(err.response?.data?.error || 'Failed to add reviewers');
+    }
   };
 
   if (!review) {
@@ -67,7 +67,9 @@ function ReviewDetail() {
         <nav>
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/create-review" className="btn btn-sm">+ New Review</Link>
-          <button onClick={handleLogout} className="btn-ghost btn-sm">Logout</button>
+          <Link to="/profile" className="header-avatar">
+            {review.author?.username?.charAt(0).toUpperCase() || 'U'}
+          </Link>
         </nav>
       </header>
 
@@ -133,6 +135,31 @@ function ReviewDetail() {
           ) : (
             <p className="text-muted">No comments yet. Be the first to leave feedback.</p>
           )}
+        </div>
+
+        <div className="comment-form" style={{ marginBottom: 'var(--space-6)' }}>
+          <h4>Add Reviewers</h4>
+          {reviewerMsg && (
+            <div className={reviewerMsg.includes('success') ? 'reviewer-success' : 'auth-error'} style={{ marginBottom: '1rem' }}>
+              {reviewerMsg}
+            </div>
+          )}
+          <form onSubmit={handleAddReviewers}>
+            <div className="form-row">
+              <div className="form-group" style={{ flex: 1 }}>
+                <label htmlFor="reviewers">Usernames</label>
+                <input
+                  id="reviewers"
+                  type="text"
+                  value={newReviewers}
+                  onChange={(e) => setNewReviewers(e.target.value)}
+                  placeholder="Comma-separated usernames (e.g. alice, bob)"
+                  required
+                />
+              </div>
+            </div>
+            <button type="submit" className="btn-sm">Add Reviewers</button>
+          </form>
         </div>
 
         <div className="comment-form">

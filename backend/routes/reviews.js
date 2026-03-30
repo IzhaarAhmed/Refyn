@@ -72,6 +72,39 @@ router.post('/:id/comments', auth, async (req, res) => {
   }
 });
 
+// Add reviewers
+router.post('/:id/reviewers', auth, async (req, res) => {
+  const { reviewers } = req.body;
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+
+    const usernames = reviewers.split(',').map(u => u.trim()).filter(Boolean);
+    if (usernames.length === 0) {
+      return res.status(400).json({ error: 'No valid usernames provided' });
+    }
+
+    const users = await User.find({ username: { $in: usernames } });
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'No matching users found' });
+    }
+
+    const existingIds = review.reviewers.map(id => id.toString());
+    const newIds = users
+      .map(u => u._id)
+      .filter(id => !existingIds.includes(id.toString()));
+
+    review.reviewers.push(...newIds);
+    await review.save();
+    await review.populate('author reviewers comments.user');
+    res.json(review);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // Update status
 router.put('/:id/status', auth, async (req, res) => {
   const { status } = req.body;

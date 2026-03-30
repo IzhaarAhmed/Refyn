@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import './PRStyleReview.css';
 
 function PRStyleReview({ reviewId }) {
@@ -12,19 +12,13 @@ function PRStyleReview({ reviewId }) {
   }, [reviewId]);
 
   const fetchReview = async () => {
-    const token = localStorage.getItem('token');
     try {
-      const res = await axios.get(`http://localhost:5000/api/reviews/${reviewId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/api/reviews/${reviewId}`);
       setReview(res.data);
 
       // Fetch GitHub integration if available
-      const githubRes = await axios.get(
-        `http://localhost:5000/api/analysis/${reviewId}/github`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+      const githubRes = await api.get(
+        `/api/analysis/${reviewId}/github`
       ).catch(() => null);
 
       if (githubRes?.data) {

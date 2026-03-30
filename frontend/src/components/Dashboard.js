@@ -1,31 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Dashboard() {
   const [reviews, setReviews] = useState([]);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchReviews = async () => {
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
           navigate('/login');
           return;
         }
-        const res = await axios.get('http://localhost:5000/api/reviews', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setReviews(res.data);
+        const [reviewsRes, userRes] = await Promise.all([
+          api.get('/api/reviews'),
+          api.get('/api/auth/me')
+        ]);
+        setReviews(reviewsRes.data);
+        setUser(userRes.data);
       } catch (err) {
         if (err.response?.status === 401) navigate('/login');
       } finally {
         setLoading(false);
       }
     };
-    fetchReviews();
+    fetchData();
   }, [navigate]);
 
   const getStatusIcon = (status) => {
@@ -34,11 +37,6 @@ function Dashboard() {
       case 'rejected': return '\u2717';
       default: return '\u25CB';
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
   };
 
   if (loading) {
@@ -59,7 +57,9 @@ function Dashboard() {
         <nav>
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/create-review" className="btn btn-sm">+ New Review</Link>
-          <button onClick={handleLogout} className="btn-ghost btn-sm">Logout</button>
+          <Link to="/profile" className="header-avatar" title={user?.username}>
+            {user?.username?.charAt(0).toUpperCase()}
+          </Link>
         </nav>
       </header>
 

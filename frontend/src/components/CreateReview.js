@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useNavigate, Link } from 'react-router-dom';
 
 function CreateReview() {
@@ -16,11 +16,8 @@ function CreateReview() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const token = localStorage.getItem('token');
     try {
-      await axios.post('http://localhost:5000/api/reviews', { title, description, originalCode, changedCode, reviewers }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post('/api/reviews', { title, description, originalCode, changedCode, reviewers });
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create review. Please try again.');
@@ -29,18 +26,13 @@ function CreateReview() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
-
   return (
     <div className="create-review-page">
       <header className="page-header">
         <Link to="/dashboard" className="logo">Re<span>fyn</span></Link>
         <nav>
           <Link to="/dashboard">Dashboard</Link>
-          <button onClick={handleLogout} className="btn-ghost btn-sm">Logout</button>
+          <Link to="/profile" className="header-avatar">U</Link>
         </nav>
       </header>
 

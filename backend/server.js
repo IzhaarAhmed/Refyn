@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
@@ -13,8 +14,12 @@ const app = express();
 console.log('Application starting');
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true
+}));
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // app.use(securityHeaders);
 // app.use(rateLimitMiddleware(
 //   process.env.RATE_LIMIT_WINDOW_MS || 60000,

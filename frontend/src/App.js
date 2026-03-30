@@ -5,6 +5,7 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import ReviewDetail from './components/ReviewDetail';
 import CreateReview from './components/CreateReview';
+import Profile from './components/Profile';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/review/:id" element={<ReviewDetail />} />
           <Route path="/create-review" element={<CreateReview />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/" element={<Login />} />
         </Routes>
       </div>

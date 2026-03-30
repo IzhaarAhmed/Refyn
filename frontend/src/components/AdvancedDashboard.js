@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import './AdvancedDashboard.css';
 
 function AdvancedDashboard() {
@@ -18,11 +18,8 @@ function AdvancedDashboard() {
   }, []);
 
   const fetchData = async () => {
-    const token = localStorage.getItem('token');
     try {
-      const res = await axios.get('http://localhost:5000/api/reviews', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/api/reviews');
 
       setReviews(res.data);
       calculateStats(res.data);

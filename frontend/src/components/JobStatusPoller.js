@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import './JobStatusPoller.css';
 
 function JobStatusPoller({ jobId, onComplete }) {
@@ -11,11 +11,9 @@ function JobStatusPoller({ jobId, onComplete }) {
   useEffect(() => {
     if (!jobId) return;
 
-    const token = localStorage.getItem('token');
     const pollJob = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/jobs/${jobId}/poll`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await api.get(`/api/jobs/${jobId}/poll`, {
           params: { timeout: 30000 }
         });
 
