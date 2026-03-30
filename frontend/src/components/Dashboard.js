@@ -50,6 +50,39 @@ function Dashboard() {
     );
   }
 
+  const createdReviews = reviews.filter(r => r.author?._id === user?._id);
+  const sharedReviews = reviews.filter(r => r.author?._id !== user?._id);
+
+  const ReviewList = ({ items, emptyMsg }) => (
+    items.length === 0 ? (
+      <p className="text-muted" style={{ padding: 'var(--space-6) 0' }}>{emptyMsg}</p>
+    ) : (
+      <div className="review-list">
+        {items.map(review => (
+          <Link to={`/review/${review._id}`} key={review._id} className="review-item">
+            <div className="review-item-left">
+              <div className={`review-icon ${review.status}`}>
+                {getStatusIcon(review.status)}
+              </div>
+              <div className="review-item-info">
+                <div className="review-item-title">{review.title}</div>
+                <div className="review-item-meta">
+                  by {review.author?.username || 'Unknown'} &middot; {review.comments?.length || 0} comment{(review.comments?.length || 0) !== 1 ? 's' : ''}
+                  {review.reviewers?.length > 0 && (
+                    <> &middot; {review.reviewers.length} reviewer{review.reviewers.length !== 1 ? 's' : ''}</>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="review-item-right">
+              <span className={`status-badge ${review.status}`}>{review.status}</span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    )
+  );
+
   return (
     <div className="dashboard-page">
       <header className="page-header">
@@ -66,7 +99,7 @@ function Dashboard() {
       <div className="page-container">
         <div className="page-toolbar">
           <div>
-            <h1 className="page-title">Reviews</h1>
+            <h1 className="page-title">Dashboard</h1>
             <p className="page-subtitle">{reviews.length} review{reviews.length !== 1 ? 's' : ''} total</p>
           </div>
           <Link to="/create-review" className="btn">+ New Review</Link>
@@ -80,26 +113,23 @@ function Dashboard() {
             <Link to="/create-review" className="btn">Create Review</Link>
           </div>
         ) : (
-          <div className="review-list">
-            {reviews.map(review => (
-              <Link to={`/review/${review._id}`} key={review._id} className="review-item">
-                <div className="review-item-left">
-                  <div className={`review-icon ${review.status}`}>
-                    {getStatusIcon(review.status)}
-                  </div>
-                  <div className="review-item-info">
-                    <div className="review-item-title">{review.title}</div>
-                    <div className="review-item-meta">
-                      by {review.author?.username || 'Unknown'} &middot; {review.comments?.length || 0} comment{(review.comments?.length || 0) !== 1 ? 's' : ''}
-                    </div>
-                  </div>
-                </div>
-                <div className="review-item-right">
-                  <span className={`status-badge ${review.status}`}>{review.status}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <>
+            {/* Created by me */}
+            <div className="dashboard-section">
+              <div className="section-header">
+                <h3 className="section-title">Created by me ({createdReviews.length})</h3>
+              </div>
+              <ReviewList items={createdReviews} emptyMsg="You haven't created any reviews yet." />
+            </div>
+
+            {/* Shared with me */}
+            <div className="dashboard-section">
+              <div className="section-header">
+                <h3 className="section-title">Shared with me ({sharedReviews.length})</h3>
+              </div>
+              <ReviewList items={sharedReviews} emptyMsg="No reviews have been shared with you yet." />
+            </div>
+          </>
         )}
       </div>
     </div>
