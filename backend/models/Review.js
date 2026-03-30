@@ -8,6 +8,11 @@ const reviewSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   reviewers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   status: { type: String, default: 'open' }, // open, approved, rejected
+  votes: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    vote: { type: String, enum: ['approved', 'rejected'] },
+    createdAt: { type: Date, default: Date.now }
+  }],
   comments: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     text: String,

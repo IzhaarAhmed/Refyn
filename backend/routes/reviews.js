@@ -48,7 +48,7 @@ router.get('/', auth, async (req, res) => {
 // Get single review
 router.get('/:id', auth, async (req, res) => {
   try {
-    const review = await Review.findById(req.params.id).populate('author reviewers comments.user');
+    const review = await Review.findById(req.params.id).populate('author reviewers comments.user votes.user');
     if (!review) {
       return res.status(404).json({ error: 'Review not found' });
     }
@@ -105,14 +105,58 @@ router.post('/:id/reviewers', auth, async (req, res) => {
   }
 });
 
-// Update status
+// Vote on review (approve/reject)
 router.put('/:id/status', auth, async (req, res) => {
-  const { status } = req.body;
+  const { status, comment } = req.body;
   try {
-    const review = await Review.findByIdAndUpdate(req.params.id, { status }, { new: true }).populate('author reviewers comments.user');
+    const review = await Review.findById(req.params.id).populate('author reviewers comments.user votes.user');
     if (!review) {
       return res.status(404).json({ error: 'Review not found' });
     }
+
+    // Author cannot vote on their own review
+    if (review.author._id.toString() === req.user._id.toString()) {
+      return res.status(403).json({ error: 'Author cannot approve or reject their own review' });
+    }
+
+    // Cannot vote if review is already finalized
+    if (review.status !== 'open') {
+      return res.status(400).json({ error: 'This review has already been ' + review.status });
+    }
+
+    // Rejection requires a comment
+    if (status === 'rejected' && (!comment || !comment.trim())) {
+      return res.status(400).json({ error: 'A comment is required when rejecting a review' });
+    }
+
+    // Check if user already voted
+    const existingVote = review.votes.find(v => v.user._id.toString() === req.user._id.toString());
+    if (existingVote) {
+      return res.status(400).json({ error: 'You have already voted on this review' });
+    }
+
+    // Add vote
+    review.votes.push({ user: req.user._id, vote: status });
+
+    // If rejecting, add the mandatory comment
+    if (status === 'rejected' && comment) {
+      review.comments.push({ user: req.user._id, text: comment, line: null });
+    }
+
+    // Check majority
+    const totalReviewers = review.reviewers.length;
+    const approvals = review.votes.filter(v => v.vote === 'approved').length;
+    const rejections = review.votes.filter(v => v.vote === 'rejected').length;
+    const majority = Math.floor(totalReviewers / 2) + 1;
+
+    if (approvals >= majority) {
+      review.status = 'approved';
+    } else if (rejections >= majority) {
+      review.status = 'rejected';
+    }
+
+    await review.save();
+    await review.populate('author reviewers comments.user votes.user');
     res.json(review);
   } catch (err) {
     res.status(400).json({ error: err.message });

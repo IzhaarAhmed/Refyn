@@ -7,19 +7,27 @@ function ReviewDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [review, setReview] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [comment, setComment] = useState('');
   const [line, setLine] = useState('');
   const [newReviewers, setNewReviewers] = useState('');
   const [reviewerMsg, setReviewerMsg] = useState('');
+  const [rejectComment, setRejectComment] = useState('');
+  const [showRejectForm, setShowRejectForm] = useState(false);
+  const [voteError, setVoteError] = useState('');
 
   useEffect(() => {
-    const fetchReview = async () => {
+    const fetchData = async () => {
       const token = localStorage.getItem('token');
       if (!token) { navigate('/login'); return; }
-      const res = await api.get(`/api/reviews/${id}`);
-      setReview(res.data);
+      const [reviewRes, userRes] = await Promise.all([
+        api.get(`/api/reviews/${id}`),
+        api.get('/api/auth/me')
+      ]);
+      setReview(reviewRes.data);
+      setCurrentUser(userRes.data);
     };
-    fetchReview();
+    fetchData();
   }, [id, navigate]);
 
   const handleComment = async (e) => {
@@ -31,9 +39,30 @@ function ReviewDetail() {
     setReview(res.data);
   };
 
-  const handleStatus = async (status) => {
-    await api.put(`/api/reviews/${id}/status`, { status });
-    setReview({ ...review, status });
+  const handleApprove = async () => {
+    setVoteError('');
+    try {
+      const res = await api.put(`/api/reviews/${id}/status`, { status: 'approved' });
+      setReview(res.data);
+    } catch (err) {
+      setVoteError(err.response?.data?.error || 'Failed to approve');
+    }
+  };
+
+  const handleReject = async (e) => {
+    e.preventDefault();
+    setVoteError('');
+    try {
+      const res = await api.put(`/api/reviews/${id}/status`, {
+        status: 'rejected',
+        comment: rejectComment
+      });
+      setReview(res.data);
+      setShowRejectForm(false);
+      setRejectComment('');
+    } catch (err) {
+      setVoteError(err.response?.data?.error || 'Failed to reject');
+    }
   };
 
   const handleAddReviewers = async (e) => {
@@ -49,7 +78,7 @@ function ReviewDetail() {
     }
   };
 
-  if (!review) {
+  if (!review || !currentUser) {
     return (
       <div className="loading-page">
         <div>
@@ -60,6 +89,14 @@ function ReviewDetail() {
     );
   }
 
+  const isAuthor = review.author?._id === currentUser._id;
+  const isFinalized = review.status !== 'open';
+  const hasVoted = review.votes?.some(v => v.user?._id === currentUser._id);
+  const canVote = !isAuthor && !isFinalized && !hasVoted;
+  const approvalCount = review.votes?.filter(v => v.vote === 'approved').length || 0;
+  const rejectionCount = review.votes?.filter(v => v.vote === 'rejected').length || 0;
+  const totalReviewers = review.reviewers?.length || 0;
+
   return (
     <div className="review-detail">
       <header className="page-header">
@@ -68,7 +105,7 @@ function ReviewDetail() {
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/create-review" className="btn btn-sm">+ New Review</Link>
           <Link to="/profile" className="header-avatar">
-            {review.author?.username?.charAt(0).toUpperCase() || 'U'}
+            {currentUser.username?.charAt(0).toUpperCase() || 'U'}
           </Link>
         </nav>
       </header>
@@ -89,13 +126,51 @@ function ReviewDetail() {
                   Reviewers: <strong>{review.reviewers.map(r => r.username).join(', ')}</strong>
                 </div>
               )}
+              {totalReviewers > 0 && (
+                <div className="review-meta-item">
+                  Votes: <strong className="text-success">{approvalCount}</strong> / <strong className="text-danger">{rejectionCount}</strong> of {totalReviewers}
+                </div>
+              )}
             </div>
           </div>
-          <div className="btn-group">
-            <button onClick={() => handleStatus('approved')} className="btn-success btn-sm">Approve</button>
-            <button onClick={() => handleStatus('rejected')} className="btn-danger btn-sm">Reject</button>
-          </div>
+
+          {/* Vote Buttons */}
+          {canVote && (
+            <div className="btn-group">
+              <button onClick={handleApprove} className="btn-success btn-sm">Approve</button>
+              <button onClick={() => setShowRejectForm(true)} className="btn-danger btn-sm">Reject</button>
+            </div>
+          )}
+          {isAuthor && review.status === 'open' && (
+            <span className="text-muted" style={{ fontSize: 'var(--font-size-sm)' }}>You cannot vote on your own review</span>
+          )}
+          {hasVoted && !isFinalized && (
+            <span className="text-muted" style={{ fontSize: 'var(--font-size-sm)' }}>You have already voted</span>
+          )}
         </div>
+
+        {/* Vote Error */}
+        {voteError && <div className="auth-error mb-4">{voteError}</div>}
+
+        {/* Reject Form */}
+        {showRejectForm && (
+          <div className="comment-form mb-4">
+            <h4>Reason for rejection (required)</h4>
+            <form onSubmit={handleReject}>
+              <textarea
+                value={rejectComment}
+                onChange={(e) => setRejectComment(e.target.value)}
+                placeholder="Explain why you are rejecting this review..."
+                required
+                rows={3}
+              />
+              <div className="btn-group" style={{ marginTop: 'var(--space-3)' }}>
+                <button type="submit" className="btn-danger btn-sm">Confirm Rejection</button>
+                <button type="button" className="btn-ghost btn-sm" onClick={() => { setShowRejectForm(false); setRejectComment(''); }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        )}
 
         {review.description && (
           <div className="review-description">{review.description}</div>
@@ -114,6 +189,32 @@ function ReviewDetail() {
             />
           </div>
         </div>
+
+        {/* Votes Summary */}
+        {review.votes?.length > 0 && (
+          <div className="comments-section">
+            <div className="section-header">
+              <h3 className="section-title">Votes ({review.votes.length})</h3>
+            </div>
+            <div className="review-list" style={{ marginBottom: 'var(--space-6)' }}>
+              {review.votes.map((v, i) => (
+                <div key={i} className="review-item" style={{ cursor: 'default' }}>
+                  <div className="review-item-left">
+                    <div className={`review-icon ${v.vote}`}>
+                      {v.vote === 'approved' ? '\u2713' : '\u2717'}
+                    </div>
+                    <div className="review-item-info">
+                      <div className="review-item-title">{v.user?.username}</div>
+                    </div>
+                  </div>
+                  <div className="review-item-right">
+                    <span className={`status-badge ${v.vote}`}>{v.vote}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="comments-section">
           <div className="section-header">
