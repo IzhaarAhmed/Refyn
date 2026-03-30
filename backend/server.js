@@ -27,11 +27,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ));
 
 // Database
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  family: 4
-})
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     // logger.info('MongoDB connected', { uri: process.env.MONGO_URI });
     console.log('MongoDB connected');
