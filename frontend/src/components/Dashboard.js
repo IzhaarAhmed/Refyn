@@ -102,7 +102,10 @@ function Dashboard() {
             <h1 className="page-title">Dashboard</h1>
             <p className="page-subtitle">{reviews.length} review{reviews.length !== 1 ? 's' : ''} total</p>
           </div>
-          <Link to="/create-review" className="btn">+ New Review</Link>
+          <div className="btn-group">
+            <Link to="/github" className="btn btn-secondary">Import from GitHub</Link>
+            <Link to="/create-review" className="btn">+ New Review</Link>
+          </div>
         </div>
 
         {reviews.length === 0 ? (

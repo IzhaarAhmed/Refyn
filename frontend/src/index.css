@@ -948,6 +948,75 @@ button span, .btn span { position: relative; z-index: 1; }
 .code-label-dot.changed { background: var(--color-success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
 
 /* ============================================
+   GITHUB IMPORT PAGE
+   ============================================ */
+.github-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  background-image: var(--gradient-mesh);
+  background-attachment: fixed;
+}
+
+.github-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.github-card {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  position: relative;
+  overflow: hidden;
+}
+
+.github-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-brand);
+}
+
+.github-card-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+.github-card-desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-5);
+}
+
+.github-card form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.github-card code {
+  background: var(--color-bg-overlay);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .github-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
    LOADING STATE
    ============================================ */
 .loading-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--color-bg); }

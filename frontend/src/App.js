@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import ReviewDetail from './components/ReviewDetail';
 import CreateReview from './components/CreateReview';
 import Profile from './components/Profile';
+import GitHubImport from './components/GitHubImport';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/review/:id" element={<ReviewDetail />} />
           <Route path="/create-review" element={<CreateReview />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/github" element={<GitHubImport />} />
           <Route path="/" element={<Login />} />
         </Routes>
       </div>
