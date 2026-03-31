@@ -45,6 +45,7 @@ const commentRoutes = require('./routes/comments');
 const githubRoutes = require('./routes/github');
 const jobRoutes = require('./routes/jobs');
 const analysisRoutes = require('./routes/analysis');
+const aiRoutes = require('./routes/ai');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/reviews', reviewRoutes);
@@ -52,6 +53,7 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/github', githubRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/analysis', analysisRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

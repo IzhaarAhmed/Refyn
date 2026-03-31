@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import api, { API_URL } from '../api';
 import { Link, useNavigate } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -113,6 +114,7 @@ function Profile() {
         <nav>
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/create-review" className="btn btn-sm">+ New Review</Link>
+          <ThemeToggle />
           <Link to="/profile" className="header-avatar active" title={user.username}>
             {avatarUrl
               ? <img src={avatarUrl} alt="" className="header-avatar-img" />

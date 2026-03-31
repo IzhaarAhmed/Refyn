@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 const User = require('../models/User');
+const { sendWelcomeEmail } = require('../services/emailService');
 
 const router = express.Router();
 
@@ -34,6 +35,7 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ username, email, password: hashedPassword });
     await user.save();
+    sendWelcomeEmail(email, username).catch(err => console.error('Welcome email failed:', err));
     res.status(201).json({ message: 'User registered' });
   } catch (err) {
     res.status(400).json({ error: err.message });

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
 import { Link, useNavigate } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 
 function GitHubImport() {
   const [integrations, setIntegrations] = useState([]);
@@ -105,6 +106,7 @@ function GitHubImport() {
         <nav>
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/create-review" className="btn btn-sm">+ New Review</Link>
+          <ThemeToggle />
           <Link to="/profile" className="header-avatar">U</Link>
         </nav>
       </header>

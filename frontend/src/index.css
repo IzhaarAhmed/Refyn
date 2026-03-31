@@ -97,6 +97,120 @@
   --header-height: 64px;
 }
 
+/* --- Light Mode Overrides --- */
+[data-theme="light"] {
+  /* Brand Gradient — softer for light */
+  --gradient-brand: linear-gradient(135deg, #7c3aed, #8b5cf6, #a78bfa);
+  --gradient-brand-hover: linear-gradient(135deg, #6d28d9, #7c3aed, #8b5cf6);
+  --gradient-mesh: radial-gradient(at 20% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                   radial-gradient(at 80% 20%, rgba(196, 167, 255, 0.1) 0%, transparent 50%),
+                   radial-gradient(at 50% 50%, rgba(186, 230, 253, 0.08) 0%, transparent 50%);
+
+  /* Colors */
+  --color-primary: #7c3aed;
+  --color-primary-hover: #6d28d9;
+  --color-primary-light: rgba(124, 58, 237, 0.1);
+  --color-primary-glow: rgba(124, 58, 237, 0.2);
+
+  --color-success: #059669;
+  --color-success-light: rgba(5, 150, 105, 0.1);
+  --color-danger: #e11d48;
+  --color-danger-light: rgba(225, 29, 72, 0.08);
+  --color-warning: #d97706;
+  --color-warning-light: rgba(217, 119, 6, 0.1);
+  --color-info: #0891b2;
+  --color-info-light: rgba(8, 145, 178, 0.1);
+
+  /* Surfaces — pastel, never pure white */
+  --color-bg: #ede9fe;
+  --color-bg-raised: rgba(221, 214, 254, 0.85);
+  --color-bg-overlay: rgba(196, 181, 253, 0.35);
+  --color-bg-input: rgba(237, 233, 254, 0.95);
+  --color-bg-glass: rgba(237, 233, 254, 0.55);
+  --color-border: rgba(167, 139, 250, 0.2);
+  --color-border-hover: rgba(139, 92, 246, 0.35);
+  --color-border-glow: rgba(124, 58, 237, 0.3);
+  --color-text: #1e1b4b;
+  --color-text-secondary: #4c4677;
+  --color-text-muted: #7c7499;
+
+  /* Shadows — lighter, pastel-tinted */
+  --shadow-sm: 0 2px 8px rgba(124, 58, 237, 0.06);
+  --shadow-md: 0 8px 24px rgba(124, 58, 237, 0.08);
+  --shadow-lg: 0 16px 48px rgba(124, 58, 237, 0.1);
+  --shadow-glow: 0 0 30px rgba(124, 58, 237, 0.1);
+  --shadow-glow-lg: 0 0 60px rgba(124, 58, 237, 0.12);
+  --shadow-colored: 0 8px 32px rgba(124, 58, 237, 0.12);
+}
+
+/* Light mode specific overrides for elements with hardcoded colors */
+[data-theme="light"] body {
+  background: linear-gradient(145deg, #ede9fe 0%, #e0e7ff 25%, #ddd6fe 50%, #fce7f3 75%, #e0e7ff 100%);
+  background-attachment: fixed;
+  color: #1e1b4b;
+}
+
+[data-theme="light"] .auth-page {
+  background: linear-gradient(145deg, #ede9fe 0%, #e0e7ff 25%, #ddd6fe 50%, #fce7f3 75%, #e0e7ff 100%);
+}
+
+[data-theme="light"] .auth-page::before {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 60%);
+}
+
+[data-theme="light"] .auth-page::after {
+  background: radial-gradient(circle, rgba(186, 230, 253, 0.15) 0%, transparent 60%);
+}
+
+[data-theme="light"] .auth-error {
+  color: #be123c;
+}
+
+[data-theme="light"] .reviewer-success {
+  color: #059669;
+}
+
+[data-theme="light"] .page-header {
+  background: rgba(221, 214, 254, 0.75);
+  backdrop-filter: blur(16px) saturate(180%);
+}
+
+[data-theme="light"] .dashboard-page {
+  background: linear-gradient(145deg, #ede9fe 0%, #e0e7ff 25%, #ddd6fe 50%, #fce7f3 75%, #e0e7ff 100%);
+  background-attachment: fixed;
+}
+
+[data-theme="light"] .profile-page {
+  background: linear-gradient(145deg, #ede9fe 0%, #e0e7ff 25%, #ddd6fe 50%, #fce7f3 75%, #e0e7ff 100%);
+  background-attachment: fixed;
+}
+
+[data-theme="light"] .profile-name {
+  background: linear-gradient(135deg, #1e1b4b, #4c4677);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .page-title {
+  background: linear-gradient(135deg, #1e1b4b 0%, #4c4677 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] ::selection {
+  background: #8b5cf6;
+  color: white;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.25);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.45);
+}
+
 /* --- Reset & Base --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; scroll-behavior: smooth; }

@@ -2,6 +2,7 @@ const express = require('express');
 const Review = require('../models/Review');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const { sendReviewFinalizedEmail } = require('../services/emailService');
 
 const router = express.Router();
 
@@ -157,6 +158,16 @@ router.put('/:id/status', auth, async (req, res) => {
 
     await review.save();
     await review.populate('author reviewers comments.user votes.user');
+
+    // Notify author when review is finalized
+    if (review.status !== 'open') {
+      sendReviewFinalizedEmail(review.author.email, {
+        reviewTitle: review.title,
+        status: review.status,
+        authorName: review.author.username
+      }).catch(err => console.error('Review finalized email failed:', err));
+    }
+
     res.json(review);
   } catch (err) {
     res.status(400).json({ error: err.message });

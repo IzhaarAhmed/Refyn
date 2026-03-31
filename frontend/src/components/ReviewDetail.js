@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import api from '../api';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactDiffViewer from 'react-diff-viewer-continued';
+import AIPanel from './AIPanel';
+import ThemeToggle from './ThemeToggle';
 
 function ReviewDetail() {
   const { id } = useParams();
@@ -104,6 +106,7 @@ function ReviewDetail() {
         <nav>
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/create-review" className="btn btn-sm">+ New Review</Link>
+          <ThemeToggle />
           <Link to="/profile" className="header-avatar">
             {currentUser.username?.charAt(0).toUpperCase() || 'U'}
           </Link>
@@ -189,6 +192,9 @@ function ReviewDetail() {
             />
           </div>
         </div>
+
+        {/* AI Assistant */}
+        <AIPanel reviewId={id} />
 
         {/* Review Summary */}
         {review.votes?.length > 0 && (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api';
 import { useNavigate, Link } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 
 function CreateReview() {
   const [title, setTitle] = useState('');
@@ -32,6 +33,7 @@ function CreateReview() {
         <Link to="/dashboard" className="logo">Re<span>fyn</span></Link>
         <nav>
           <Link to="/dashboard">Dashboard</Link>
+          <ThemeToggle />
           <Link to="/profile" className="header-avatar">U</Link>
         </nav>
       </header>

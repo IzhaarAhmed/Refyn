@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
 import { Link, useNavigate } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 
 function Dashboard() {
   const [reviews, setReviews] = useState([]);
@@ -90,6 +91,7 @@ function Dashboard() {
         <nav>
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/create-review" className="btn btn-sm">+ New Review</Link>
+          <ThemeToggle />
           <Link to="/profile" className="header-avatar" title={user?.username}>
             {user?.username?.charAt(0).toUpperCase()}
           </Link>

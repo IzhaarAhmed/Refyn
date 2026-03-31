@@ -2,8 +2,11 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import './LandingPage.css';
+import ThemeToggle from '../ThemeToggle';
+import StarryBackground from '../StarryBackground';
 
 const ThreeScene = React.lazy(() => import('./ThreeScene'));
+const ThreeBackground = React.lazy(() => import('./ThreeBackground'));
 
 /* ===== Animation Variants ===== */
 const fadeUp = {
@@ -50,7 +53,9 @@ function Navbar() {
           <a href="https://github.com/IzhaarAhmed/Refyn" target="_blank" rel="noreferrer">GitHub</a>
         </div>
         <div className="lp-navbar__actions">
+          <ThemeToggle />
           <Link to="/login" className="lp-btn lp-btn--ghost">Login</Link>
+          <Link to="/register" className="lp-btn lp-btn--ghost">Sign Up</Link>
           <Link to="/register" className="lp-btn lp-btn--primary">Start Reviewing</Link>
         </div>
       </div>
@@ -70,9 +75,6 @@ function Hero() {
           animate="visible"
           variants={stagger}
         >
-          <motion.div className="lp-hero__badge" variants={fadeUp}>
-            Built for modern dev teams
-          </motion.div>
           <motion.h1 className="lp-hero__title" variants={fadeUp}>
             Collaborative Code Reviews
             <br />
@@ -482,6 +484,10 @@ function Footer() {
 export default function LandingPage() {
   return (
     <div className="lp">
+      <StarryBackground />
+      <Suspense fallback={null}>
+        <ThreeBackground />
+      </Suspense>
       <Navbar />
       <Hero />
       <TrustBar />

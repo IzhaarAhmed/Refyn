@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api';
 import { useNavigate } from 'react-router-dom';
+import StarryBackground from './StarryBackground';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -26,6 +27,7 @@ function Login() {
 
   return (
     <div className="auth-page">
+      <StarryBackground />
       <div className="auth-card">
         <div className="auth-logo">
           <h1>Re<span>fyn</span></h1>
