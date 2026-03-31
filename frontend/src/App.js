@@ -7,6 +7,7 @@ import ReviewDetail from './components/ReviewDetail';
 import CreateReview from './components/CreateReview';
 import Profile from './components/Profile';
 import GitHubImport from './components/GitHubImport';
+import LandingPage from './components/landing/LandingPage';
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
           <Route path="/create-review" element={<CreateReview />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/github" element={<GitHubImport />} />
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<LandingPage />} />
         </Routes>
       </div>
     </Router>
