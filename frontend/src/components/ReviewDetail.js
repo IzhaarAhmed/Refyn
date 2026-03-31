@@ -190,29 +190,87 @@ function ReviewDetail() {
           </div>
         </div>
 
-        {/* Votes Summary */}
+        {/* Review Summary */}
         {review.votes?.length > 0 && (
-          <div className="comments-section">
+          <div className="review-summary">
             <div className="section-header">
-              <h3 className="section-title">Votes ({review.votes.length})</h3>
+              <h3 className="section-title">Review Summary</h3>
+              {isFinalized && (
+                <span className={`status-badge ${review.status}`}>{review.status}</span>
+              )}
             </div>
-            <div className="review-list" style={{ marginBottom: 'var(--space-6)' }}>
-              {review.votes.map((v, i) => (
-                <div key={i} className="review-item" style={{ cursor: 'default' }}>
-                  <div className="review-item-left">
-                    <div className={`review-icon ${v.vote}`}>
-                      {v.vote === 'approved' ? '\u2713' : '\u2717'}
+
+            {/* Review Info */}
+            <div className="summary-info">
+              <div className="summary-info-item">
+                <span className="summary-label">Created by</span>
+                <span className="summary-value">{review.author?.username}</span>
+              </div>
+              <div className="summary-info-item">
+                <span className="summary-label">Created on</span>
+                <span className="summary-value">{new Date(review.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+              <div className="summary-info-item">
+                <span className="summary-label">Total votes</span>
+                <span className="summary-value">
+                  <strong className="text-success">{approvalCount} approved</strong>
+                  {' / '}
+                  <strong className="text-danger">{rejectionCount} rejected</strong>
+                  {' of '}{totalReviewers} reviewer{totalReviewers !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+
+            {/* Approved By */}
+            {approvalCount > 0 && (
+              <div className="summary-group">
+                <h4 className="summary-group-title text-success">Approved by ({approvalCount})</h4>
+                <div className="summary-voters">
+                  {review.votes.filter(v => v.vote === 'approved').map((v, i) => (
+                    <div key={i} className="summary-voter">
+                      <div className="summary-voter-avatar approved">{v.user?.username?.charAt(0).toUpperCase()}</div>
+                      <div className="summary-voter-info">
+                        <strong>{v.user?.username}</strong>
+                        <span className="summary-timestamp">{new Date(v.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                      <span className="status-badge approved">approved</span>
                     </div>
-                    <div className="review-item-info">
-                      <div className="review-item-title">{v.user?.username}</div>
-                    </div>
-                  </div>
-                  <div className="review-item-right">
-                    <span className={`status-badge ${v.vote}`}>{v.vote}</span>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+
+            {/* Rejected By */}
+            {rejectionCount > 0 && (
+              <div className="summary-group">
+                <h4 className="summary-group-title text-danger">Rejected by ({rejectionCount})</h4>
+                <div className="summary-voters">
+                  {review.votes.filter(v => v.vote === 'rejected').map((v, i) => {
+                    const rejectionComment = review.comments?.find(
+                      c => c.user?._id === v.user?._id &&
+                        Math.abs(new Date(c.createdAt) - new Date(v.createdAt)) < 5000
+                    );
+                    return (
+                      <div key={i} className="summary-voter summary-voter--with-comment">
+                        <div className="summary-voter-row">
+                          <div className="summary-voter-avatar rejected">{v.user?.username?.charAt(0).toUpperCase()}</div>
+                          <div className="summary-voter-info">
+                            <strong>{v.user?.username}</strong>
+                            <span className="summary-timestamp">{new Date(v.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                          <span className="status-badge rejected">rejected</span>
+                        </div>
+                        {rejectionComment && (
+                          <div className="summary-rejection-comment">
+                            <p>{rejectionComment.text}</p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
