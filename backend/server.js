@@ -60,6 +60,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+app.get('/ping', (req, res) => {
+  res.status(200).send('Alive');
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   // logger.error('Unhandled error', { error: err.message, stack: err.stack });
