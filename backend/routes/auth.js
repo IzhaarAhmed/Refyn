@@ -106,5 +106,8 @@ router.post('/me/avatar', auth, upload.single('avatar'), async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
+// Ping
+router.get('/ping', (req, res) =>{
+  res.status(200).send('Alive')
+});
 module.exports = router;
